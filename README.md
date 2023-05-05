@@ -1,63 +1,34 @@
-# Тестовое задание для участников JetBrains Bootcamp
+# Jetbrains Bootcamp Test Assignment
 
-Это тестовое задание предназначено для отбора участников летней стажировки 
-для младшекурсников JetBrains Bootcamp. Ожидаемое время выполнения — 6–8 часов.
-По всем вопросам, связанным с выполнением задания, можно обращаться к Виталию Брагилевскому 
-(vitaly.bragilevsky@jetbrains.com, @bravit111 в телеграме).
+When working with large codebases, it is often convenient to know who knows best about the contents
+of a given file. On the one hand, it may be the person who wrote the most code in that file. On the
+other hand, especially if the file has existed a long time ago, it may sometimes be that the
+original author hasn't looked into it for a long time
+and may have forgotten about it. Surely someone who has worked with this code recently, but who has
+made a significant contribution to this code may be able to provide more up-to-date information.
+Let's call such a person the **code owner**.
 
-## Задание
+This is an IntelliJ IDEA plugin that uses data from the
+version control data, evaluate each committer's contribution to the selected file, and make a
+recommendation, who to approach with questions. There is a template for the plugin - it is an
+action (`AnAction`) in the `org.intellij.sdk.action.CodeOwnerFinderAction` class. It can be called
+from the dropdown menu for any file in the Project View. The plugin can return information in a
+dialog box created with `Messages.showMessageDialog`.
 
-При работе с большими кодовыми базами часто удобно знать, кто лучше всех разбирается 
-в содержимом конкретного файла. С одной стороны, это может быть человек, который 
-написал в этом файле больше всего кода. С другой, особенно если файл существует 
-достаточно давно, может случиться так, что исходный автор долго этого кода не касался
-и уже мог всё забыть. Наверняка тот, кто с этим кодом работал недавно, но при этом
-сделал достаточно значительный вклад, может дать более актуальную информацию. 
-Будем называть такого человека владельцем кода (code owner).
+The central component of the job is an algorithm for calculating the contribution of individual
+committers to a given file using data from the version control system and identifying the owner of
+the code.
 
-Реализуйте плагин к IntelliJ IDEA, который по данным системы
-контроля версий оценивает вклад каждого коммиттера в выбранный файл и выдаёт рекомендацию, 
-к кому стоит обращаться с вопросами. Заготовка для плагина уже есть – это действие (`AnAction`)
-в классе `org.intellij.sdk.action.CodeOwnerFinderAction`. Его можно вызвать из выпадающего
-меню для любого файла из Project View. Плагин может возвращать информацию в диалоговом окне, 
-создаваемом с помощью `Messages.showMessageDialog`.
+When implementing the plugin, I used the following IntelliJ Platform classes, properties and
+methods:
 
-Центральный компонент задания — это алгоритм вычисления вклада отдельных коммиттеров
-в заданный файл по данным системы контроля версий и определения владельца кода. Постарайтесь
-сделать его максимально интеллектуальным. Результат работы алгоритма может, к примеру, не просто
-возвращать владельца, но и оценивать вклад каждого разработчика в специальных баллах.
-Не забудьте подробно описать и обосновать применимость своего алгоритма.
+* `ProjectLevelVcsManager.getInstance` to access version control system data
+* `VcsContextFactory.SERVICE.getInstance()` to work with files and paths that are managed by a
+  version control system
+* `AbstractVcs.vcsHistoryProvider` to get a list of revisions (including for a given file)
+* `VcsFileRevision
 
-### Порядок выполнения и отправки на проверку 
-
-Разработку следует вести в ветке `main`, а для отправки на проверку необходимо создать пулл-реквест 
-на ветку `task`.
-
-### Подсказки
-
-При реализации плагина вам могут понадобиться следующие классы, свойства и методы IntelliJ Platform:
-
-* `ProjectLevelVcsManager.getInstance` для доступа к данным системы контроля версий
-* `VcsContextFactory.SERVICE.getInstance()` для работы с файлами и путями, находящимися 
-   под управлением системы контроля версий
-* `AbstractVcs.vcsHistoryProvider` для получения списка ревизий (в том числе для заданного файла)
-* `VcsFileRevision`
-
-Некоторые операции, связанные с системой контроля версий, нельзя выполнять в потоке UI (в котором
-запускается метод `actionPerformed`). Такие операции следует запускать в специальном потоке 
-для ввода-вывода. Для этого проще всего воспользоваться функцией `runBlocking`:
-
-```kotlin
-val smth = runBlocking(Dispatchers.IO) {
-    // запрос к системе контроля версий
-}
-```
-
-Правда, это приведёт к блокировке пользовательского интерфейса, но если операция не займёт
-слишком много времени, то и нестрашно.
-
-
-## Полезные ссылки по разработке плагинов к IntelliJ IDEA
+## The references I studied for developing plugins for IntelliJ IDEA
 
 * [IntelliJ Platform SDK](https://plugins.jetbrains.com/docs/intellij/welcome.html)
 * [Running a Simple Gradle-Based IntelliJ Platform Plugin](https://plugins.jetbrains.com/docs/intellij/gradle-prerequisites.html#executing-the-plugin)
